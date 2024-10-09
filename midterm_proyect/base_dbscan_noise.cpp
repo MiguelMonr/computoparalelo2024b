@@ -7,18 +7,6 @@
 
 using namespace std;
 
-/* struct Point
-{
-    double x, y;
-    int cluster; // -1: unvisited, 0: noise, >0: cluster ID
-};
-
-double distance(const Point &p1, const Point &p2)
-{
-    return sqrt(pow(p1.x - p2.x, 2) + pow(p1.y - p2.y, 2));
-}
- */
-
 double calculate_distance(float *point1, float *point2)
 {
     return sqrt(pow(point1[0] - point2[0], 2) + pow(point1[1] - point2[1], 2));
@@ -68,6 +56,7 @@ void expandCluster(float **points, long long int size, long long int point_idx, 
     }
 }
 
+//* La epsilon la define el usuario
 void dbscan(float **points, long long int size, float epsilon, int min_samples)
 {
     int clusterID = 1;
@@ -109,6 +98,7 @@ void load_CSV(string file_name, float **points, long long int size)
         points[point_number][0] = stof(row.substr(0, 5));
         points[point_number][1] = stof(row.substr(6, 5));
         point_number++;
+        delete[] line;
     }
 }
 
@@ -127,13 +117,15 @@ void save_to_CSV(string file_name, float **points, long long int size)
 int main(int argc, char **argv)
 {
 
-    const float epsilon = 0.03;
+    const float epsilon = 1.2;
     const int min_samples = 10;
-    const long long int size = 4000;
+    const long long int size = 3000;
     const string input_file_name = to_string(size) + "_data.csv";
     const string output_file_name = to_string(size) + "_results.csv";
     float **points = new float *[size];
 
+    // TODO: Preguntar octavio para que sirve esto
+    // Primera prueba
     for (long long int i = 0; i < size; i++)
     {
         points[i] = new float[3]{0.0, 0.0, 0.0};
@@ -145,6 +137,8 @@ int main(int argc, char **argv)
     load_CSV(input_file_name, points, size);
 
     noise_detection(points, epsilon, min_samples, size);
+
+    dbscan(points, size, epsilon, min_samples);
 
     save_to_CSV(output_file_name, points, size);
 

@@ -4,8 +4,10 @@
 #include <fstream>
 #include <cmath>
 #include <vector>
+#include <chrono>
 
 using namespace std;
+using namespace std::chrono;
 
 double calculate_distance(float *point1, float *point2)
 {
@@ -26,7 +28,7 @@ void regionQuery(float **points, long long int size, long long int point_idx, fl
         }
     }
     // Depuración: Mostrar cuántos vecinos se encontraron para cada punto
-    cout << "Punto " << point_idx << " encontró " << neighbors.size() << " vecinos dentro de epsilon.\n";
+    // cout << "Punto " << point_idx << " encontró " << neighbors.size() << " vecinos dentro de epsilon.\n";
 }
 
 void expandCluster(float **points, long long int size, long long int point_idx, int clusterID, float epsilon, int min_samples)
@@ -35,7 +37,7 @@ void expandCluster(float **points, long long int size, long long int point_idx, 
     regionQuery(points, size, point_idx, epsilon, neighbors);
 
     // Depuración: Mostrar cuántos vecinos se encontraron antes de decidir si es ruido
-    cout << "Punto " << point_idx << " tiene " << neighbors.size() << " vecinos.\n";
+    // cout << "Punto " << point_idx << " tiene " << neighbors.size() << " vecinos.\n";
 
     if (neighbors.size() < min_samples)
     {
@@ -150,11 +152,14 @@ int main(int argc, char **argv)
     }
 
     load_CSV(input_file_name, points, size);
-
+    int tiempo_ejecucion = 0;
+    auto start = high_resolution_clock::now();
     dbscan(points, size, epsilon, min_samples);
-
+    auto end = high_resolution_clock::now();
+    auto duration = duration_cast<seconds>(end - start);
     save_to_CSV(output_file_name, points, size);
 
+    cout << "Tiempo de ejecución del algoritmo DBSCAN: " << duration.count() << " segundos" << endl;
     for (long long int i = 0; i < size; i++)
     {
         delete[] points[i];
